@@ -1,0 +1,18 @@
+# Note: Parameters are automatically loaded from .env by bin/console
+# Environment variables are converted to lowercase and injected as container parameters
+# Example: INPUT_FILE_SOCIAL in .env becomes 'input_file_social' parameter
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    # Auto-discover all services
+    App\Service\:
+        resource: '../src/Service/'
+
+    # Auto-discover commands and tag them
+    App\Command\:
+        resource: '../src/Command/'
+        tags: ['console.command']

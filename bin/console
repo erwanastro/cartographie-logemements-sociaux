@@ -1,0 +1,48 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\Dotenv\Dotenv;
+
+// Load environment variables from .env file
+$dotenv = new Dotenv();
+$dotenv->load(__DIR__ . '/../.env');
+
+// Build the DI Container
+$container = new ContainerBuilder();
+
+// Inject environment variables as container parameters
+// Converts .env variables (e.g., INPUT_FILE_SOCIAL) to lowercase parameters (input_file_social)
+// These parameters can be used in services.yaml and autowired into commands
+foreach ($_ENV as $key => $value) {
+    if (is_string($value)) {
+        $container->setParameter(strtolower($key), $value);
+    }
+}
+
+// Load services configuration from services.yaml
+$loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../config'));
+$loader->load('services.yaml');
+
+// Compile the container
+$container->compile();
+
+// Create application
+$application = new Application('GeoJSON Parcelles CLI', '1.0.0');
+
+// Auto-register all commands tagged as 'console.command'
+foreach ($container->findTaggedServiceIds('console.command') as $id => $tags) {
+    $command = $container->get($id);
+    if ($command instanceof Command) {
+        $application->addCommand($command);
+    }
+}
+
+// Run application
+$application->run();
