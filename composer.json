@@ -1,6 +1,7 @@
 {
     "name": "erwanastro/geojson-parcelles",
     "description": "Minimal Symfony 8 console application for processing cadastral parcels",
+    "license": "mit",
     "type": "project",
     "require": {
         "php": ">=8.2",
